@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ask, post, ago } from "@/lib/api";
 
-const ICON = { mention: "@", comment: "💬", stuck: "🚧", task: "✅" };
+const ICON = { mention: "@", comment: "💬", stuck: "🚧", task: "✅", share: "🌐" };
 
 // Checks every 30s (every 2 min while the tab is in the background). New ones also pop a desktop alert once allowed.
 export default function Bell({ onOpen, onNew }) {

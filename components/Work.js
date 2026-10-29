@@ -69,7 +69,7 @@ export default function Work({ d, openDay }) {
     {list.map(s => <div className="card" key={s.day}>
       <div className="head"><button className="link" onClick={() => openDay(s.day)}>Day {s.day}</button><span className="muted">{when(s) && fmt(when(s))}</span></div>
       {s.text && <p className="pre">{s.text}</p>}
-      <Files s={s} />
+      <Files s={s} badges />
       {d.comments.some(c => c.day === s.day && c.owner === me) && <p className="muted">💬 {d.comments.filter(c => c.day === s.day && c.owner === me).length} comments</p>}
     </div>)}
     {!list.length && <p className="muted">{mine.length ? "Nothing matches that search." : "You haven't submitted any work yet."}</p>}

@@ -26,7 +26,9 @@ label select{display:block;width:100%;margin-bottom:6px;padding:6px 8px}
 .card.stuck{border-color:#e8a23a;background:#fffaf0}
 .flag{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#fff3dc;border-radius:6px;padding:6px 8px;margin:6px 0;font-size:14px}
 
-.cbtn{margin-top:8px;font-size:13px}
+.cbtn{margin:8px 16px 0 0;font-size:13px}
+button.share{background:#fff;color:var(--mute);border:1px solid var(--line);border-radius:10px;font-size:11px;padding:1px 7px;margin-left:4px}
+button.share.on{color:var(--ok);border-color:var(--ok);background:#eef7f1}
 .cmts{border-top:1px solid var(--line);margin-top:10px;padding-top:8px}
 .cmt{font-size:14px;margin-bottom:8px}.at{color:var(--acc);font-weight:600}
 .cmts .row input{margin:0}

@@ -38,7 +38,7 @@ function Mine({ d, day, s, reload }) {
       <button onClick={() => why.trim() && flag(why)}>Tell admin</button>
       <button className="g" onClick={() => setWhy(null)}>Cancel</button>
     </div>}
-    <div style={{ marginTop: 8 }}><Files s={s} /></div>
+    <div style={{ marginTop: 8 }}><Files s={s} badges /></div>
     {err && <p className="err">{err}</p>}
     <Comments d={d} day={day} owner={d.me.username} reload={reload} />
   </div>;
@@ -99,6 +99,7 @@ export default function Home() {
     {tab === "days" && (admin ? <>
       {stuck.length > 0 && <div className="card stuck"><h3>🚧 Blockers ({stuck.length})</h3>
         {stuck.map(s => <div key={s.day + s.username}><button className="link" onClick={() => setDay(s.day)}>{name(s.username)} · Day {s.day}</button>: {s.stuck}</div>)}</div>}
+      <p className="muted">Files and links are seen only by you and their owner until you click 🔒 Private to share them with the team.</p>
       {d.users.filter(u => u.role === "member").map(u => <SubCard key={u.username} d={d} day={day} owner={u.username} reload={load} />)}
       <div className="card"><h3>Add member / reset password</h3>
         <input placeholder="Name" onChange={e => setF({ ...f, name: e.target.value })} />

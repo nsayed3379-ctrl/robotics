@@ -19,7 +19,7 @@ http.createServer(async (req, res) => {
   const put = (range, values) => sheets.spreadsheets.values.update({ spreadsheetId: sh, range, valueInputOption: "RAW", requestBody: { values } });
   await put("Users!A1", [["username", "name", "role", "hash"], ["nursayed", "Nur Sayed", "admin", await bcrypt.hash(pw, 10)]]);
   await put("Days!A1", [["day", "date"], ["1", new Date().toLocaleDateString("en-CA")]]);
-  await put("Subs!A1", [["day", "username", "text", "links", "files", "updated", "stuck"]]);
+  await put("Subs!A1", [["day", "username", "text", "links", "files", "updated", "stuck", "shared"]]);
   await put("Tasks!A1", [["id", "title", "deadline", "priority", "status", "assignee", "by", "created"]]);
   await put("Comments!A1", [["id", "day", "owner", "author", "text", "created"]]);
   await put("Notes!A1", [["id", "user", "kind", "text", "day", "owner", "created", "read"]]);

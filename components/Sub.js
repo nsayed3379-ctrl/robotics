@@ -1,15 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { post, send, ago } from "@/lib/api";
 
-export const blank = { text: "", links: [], files: [], stuck: "" };
-export const hasWork = s => !!(s.text.trim() || s.links.length || s.files.length);
+export const blank = { text: "", links: [], files: [], stuck: "", shared: [] };
+export const hasWork = s => !!(s.text.trim() || s.links.length || s.files.length || s.hidden);
 const nameOf = (d, u) => d.users.find(x => x.username === u)?.name || u;
 
-export function Files({ s }) {
+// share(keys, on) is passed for the admin and adds a 🔒/🌐 toggle per item; badges marks the owner's own shared items.
+export function Files({ s, share, badges }) {
+  const on = k => (s.shared || []).includes(k);
+  const tag = k => share
+    ? <button className={`share${on(k) ? " on" : ""}`} onClick={() => share([k], !on(k))} title={on(k) ? "Visible to the whole team. Click to make private." : "Only you and the owner can see this. Click to share with the team."}>{on(k) ? "🌐 Shared" : "🔒 Private"}</button>
+    : badges && on(k) && <span className="muted"> · 🌐 shared with team</span>;
   return <>
-    {s.files.map(f => <div key={f.id}>📄 <a href={`/api/files/${f.id}`} target="_blank">{f.name}</a></div>)}
-    {s.links.map((l, i) => <div key={i}>🔗 <a href={l} target="_blank" rel="noopener noreferrer">{l}</a></div>)}
+    {s.files.map(f => <div key={f.id}>📄 <a href={`/api/files/${f.id}`} target="_blank">{f.name}</a> {tag(f.id)}</div>)}
+    {s.links.map((l, i) => <div key={i}>🔗 <a href={l} target="_blank" rel="noopener noreferrer">{l}</a> {tag(l)}</div>)}
+    {s.hidden > 0 && <div className="muted">🔒 {s.hidden} more {s.hidden > 1 ? "attachments" : "attachment"}, not shared with the team</div>}
   </>;
 }
 
@@ -45,14 +51,26 @@ export function Comments({ d, day, owner, reload }) {
 
 // One member's work for a day: team feed and the admin's day view.
 export function SubCard({ d, day, owner, reload }) {
-  const s = d.subs.find(x => x.day === day && x.username === owner) || blank;
+  const found = d.subs.find(x => x.day === day && x.username === owner) || blank;
+  // Sharing shows at once; the reload replaces this with what the server saved.
+  const [mine, setMine] = useState(null);
+  useEffect(() => setMine(null), [found.shared]);
+  const s = mine ? { ...found, shared: mine } : found;
+  const keys = [...s.files.map(f => f.id), ...s.links], allOn = keys.length > 0 && keys.every(k => s.shared.includes(k));
+  const share = async (ks, on) => {
+    setMine(on ? [...new Set([...s.shared, ...ks])] : s.shared.filter(k => !ks.includes(k)));
+    await post("/api/share", { day, username: owner, keys: ks, on });
+    reload();
+  };
+  const admin = d.me.role === "admin";
   return <div className={`card${s.stuck ? " stuck" : ""}`}>
     <div className="head"><h3>{nameOf(d, owner)}</h3>{s.updated && <span className="muted">{ago(s.updated)}</span>}</div>
     {s.stuck && <div className="flag">🚧 Stuck: {s.stuck}
-      {d.me.role === "admin" && <button className="g" onClick={async () => { await post("/api/stuck", { day, username: owner, text: "" }); reload(); }}>Mark solved</button>}</div>}
+      {admin && <button className="g" onClick={async () => { await post("/api/stuck", { day, username: owner, text: "" }); reload(); }}>Mark solved</button>}</div>}
     {s.text && <p className="pre">{s.text}</p>}
-    <Files s={s} />
-    {!hasWork(s) && <em className="muted">Nothing submitted yet</em>}
+    <Files s={s} share={admin ? share : undefined} />
+    {admin && keys.length > 1 && <button className="link cbtn" onClick={() => share(keys, !allOn)}>{allOn ? "🔒 Make all private" : "🌐 Share all with team"}</button>}
+    {!hasWork(s) && <div className="muted"><em>Nothing submitted yet</em></div>}
     <Comments d={d} day={day} owner={owner} reload={reload} />
   </div>;
 }
